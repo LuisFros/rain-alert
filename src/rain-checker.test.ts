@@ -5,6 +5,10 @@ const browserConfig = {
   devtools: false,
   args: ['--no-sandbox', '--disable-setuid-sandbox'] // For running on debian in docker
 }
+// const x = 157225.64
+// const y = -3770863.25
+const x = -4940.77
+const y = -3623871.87
 describe('Check for rain', () => {
   let browser: any
   beforeEach(async () => {
@@ -13,43 +17,36 @@ describe('Check for rain', () => {
   afterEach(async () => {
     await browser.close()
   })
-  it('check for rain', async () => {
+  it('check for rain 2', async () => {
     const page = await browser.newPage()
-    await page.setViewport({ width: 1920, height: 1080 })
-    await page.goto('https://www.dmi.dk/radar/')
-    // Reject cookies
-    await page.click('#declineButton')
-
-    // Drag the radar indicator to the most possible in the future
-    // Drags the mouse from a point
-    await page.mouse.move(979, 836)
-    await page.mouse.down()
-    // Drops the mouse to another point
-    await page.mouse.move(1530, 835)
-    await page.mouse.up()
-
+    const bbox = `${x - 15},${y - 15},${x + 15},${y + 15}`
+    await page.goto(
+      `https://www.dmi.dk/ZoombareKort/map?SERVICE=WMS&VERSION=1.1.1&REQUEST=GetMap&FORMAT=image%2Fpng&TRANSPARENT=true&TIME=2022-05-19T20%3A00%3A00Z&REFERENCE_TIME=2022-05-19T19%3A55%3A00Z&LAYERS=nowcast_radar&WIDTH=512&HEIGHT=512&SRS=EPSG%3A3575&STYLES=&BBOX=${encodeURIComponent(
+        bbox
+      )}`
+    )
+    console.log(
+      `https://www.dmi.dk/ZoombareKort/map?SERVICE=WMS&VERSION=1.1.1&REQUEST=GetMap&FORMAT=image%2Fpng&TRANSPARENT=true&TIME=2022-05-19T20%3A00%3A00Z&REFERENCE_TIME=2022-05-19T19%3A55%3A00Z&LAYERS=nowcast_radar&WIDTH=512&HEIGHT=512&SRS=EPSG%3A3575&STYLES=&BBOX=${encodeURIComponent(
+        bbox
+      )}`
+    )
     // Get the canvas and find a single pixel around Copenhagen
     const pixel = await page.evaluate(() => {
-      const canvas = <HTMLCanvasElement>(
-        document.evaluate(
-          '/html/body/main/section[2]/div[1]/div/div[2]/div/div/div/div/div/div[1]/div[1]/div/canvas',
-          document,
-          null,
-          XPathResult.FIRST_ORDERED_NODE_TYPE,
-          null
-        ).singleNodeValue
-      )
+      const canvas = <HTMLCanvasElement>document.createElement('canvas')
+      const img = <HTMLImageElement>document.getElementsByClassName('shrinkToFit')[0]
+      console.log(img)
+      canvas.width = img.width
+      canvas.height = img.height
+      const centerX = canvas.width / 2
+      const centerY = canvas.height / 2
 
-      if (!canvas) {
-        return []
+      const canvasContext = canvas.getContext('2d')
+      console.log(canvas, canvasContext)
+      if (canvasContext) {
+        // Get one pixel in the center of the image
+        return canvasContext.getImageData(centerX, centerY, 1, 1).data
       }
-      const context = canvas.getContext('2d')
-      if (!context) {
-        return []
-      }
-      const pixel = context.getImageData(705, 407, 1, 1).data
-
-      return pixel
+      return []
     })
     console.log(pixel)
 
