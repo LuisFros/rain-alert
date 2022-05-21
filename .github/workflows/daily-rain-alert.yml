@@ -51,7 +51,7 @@ jobs:
         
       # Run the rain checker puppeteer test
       - name: test
-        run: npm test "rain-checker2.test"
+        run: npm test
 
       # Add the state file for today since we're about to send a rain notification 
       - name: Add file for today to git
@@ -68,7 +68,7 @@ jobs:
         uses: imjohnbo/issue-bot@3daae12aa54d38685d7ff8459fc8a2aee8cea98b
         with:
           assignees: "LuisFros"
-          labels: "weekly sync, docs-team"
+          labels: "rain""
           title: "Rain"
           body: |
             ### It will rain soon
