@@ -19,22 +19,21 @@ describe('Check for rain Other', () => {
   })
   it('check for rain 2', async () => {
     const page = await browser.newPage()
-    const bbox = `${x - 15},${y - 15},${x + 15},${y + 15}`
-    await page.goto(
-      `https://www.dmi.dk/ZoombareKort/map?SERVICE=WMS&VERSION=1.1.1&REQUEST=GetMap&FORMAT=image%2Fpng&TRANSPARENT=true&TIME=2022-05-19T20%3A00%3A00Z&REFERENCE_TIME=2022-05-19T19%3A55%3A00Z&LAYERS=nowcast_radar&WIDTH=512&HEIGHT=512&SRS=EPSG%3A3575&STYLES=&BBOX=${encodeURIComponent(
-        bbox
-      )}`
-    )
-    console.log(
-      `https://www.dmi.dk/ZoombareKort/map?SERVICE=WMS&VERSION=1.1.1&REQUEST=GetMap&FORMAT=image%2Fpng&TRANSPARENT=true&TIME=2022-05-19T20%3A00%3A00Z&REFERENCE_TIME=2022-05-19T19%3A55%3A00Z&LAYERS=nowcast_radar&WIDTH=512&HEIGHT=512&SRS=EPSG%3A3575&STYLES=&BBOX=${encodeURIComponent(
-        bbox
-      )}`
-    )
+    const bbox = encodeURIComponent(`${x - 15},${y - 15},${x + 15},${y + 15}`)
+    const date = new Date()
+    const dateEncoded = encodeURIComponent(date.toISOString())
+
+    date.setTime(date.getTime() + 1 * 60 * 60 * 1000)
+    const endDateEncoded = encodeURIComponent(date.toISOString())
+
+    const url = `https://www.dmi.dk/ZoombareKort/map?SERVICE=WMS&VERSION=1.1.1&REQUEST=GetMap&FORMAT=image%2Fpng&TRANSPARENT=true&TIME=${endDateEncoded}&REFERENCE_TIME=${dateEncoded}&LAYERS=nowcast_radar&WIDTH=512&HEIGHT=512&SRS=EPSG%3A3575&STYLES=&BBOX=${bbox}`
+    await page.goto(url)
+    console.log(url)
+
     // Get the canvas and find a single pixel around Copenhagen
     const pixel = await page.evaluate(() => {
+      const img = <HTMLImageElement>document.querySelector('img')
       const canvas = <HTMLCanvasElement>document.createElement('canvas')
-      const img = <HTMLImageElement>document.getElementsByClassName('shrinkToFit')[0]
-      console.log(img)
       canvas.width = img.width
       canvas.height = img.height
       const centerX = canvas.width / 2
@@ -43,6 +42,7 @@ describe('Check for rain Other', () => {
       const canvasContext = canvas.getContext('2d')
       console.log(canvas, canvasContext)
       if (canvasContext) {
+        canvasContext.drawImage(img, 0, 0)
         // Get one pixel in the center of the image
         return canvasContext.getImageData(centerX, centerY, 1, 1).data
       }
