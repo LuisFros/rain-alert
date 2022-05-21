@@ -51,7 +51,7 @@ jobs:
         
       # Run the rain checker puppeteer test
       - name: test
-        run: npm test
+        run: npm test "rain-checker2.test"
 
       # Add the state file for today since we're about to send a rain notification 
       - name: Add file for today to git

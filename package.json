@@ -20,14 +20,14 @@
   },
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/mathiastj/rain-alert.git"
+    "url": "git+https://github.com/luisfros/rain-alert.git"
   },
   "author": "",
   "license": "ISC",
   "bugs": {
-    "url": "https://github.com/mathiastj/rain-alert/issues"
+    "url": "https://github.com/luisfros/rain-alert/issues"
   },
-  "homepage": "https://github.com/mathiastj/rain-alert#readme",
+  "homepage": "https://github.com/luisfros/rain-alert#readme",
   "devDependencies": {
     "@babel/cli": "7.16.8",
     "@babel/core": "7.16.12",
