@@ -1,0 +1,79 @@
+name: Daily rain alert
+
+on:
+  schedule:
+    - cron:  '12,42 11-16 * * MON-FRI'
+  # “At minute 12 and 42 past every hour from 11 through 16 on every day-of-week from Monday through Friday.”
+  # Allows you to run this workflow manually from the Actions tab
+  workflow_dispatch:
+
+jobs:
+  build:
+    # The type of runner that the job will run on
+    runs-on: ubuntu-latest
+    # Supposedly good for running puppeteer
+    container: lironavon/docker-puppeteer-container:16.10.0
+
+    # Steps represent a sequence of tasks that will be executed as part of the job
+    steps:
+      # Checks-out your repository under $GITHUB_WORKSPACE, so your job can access it
+      - uses: actions/checkout@v3
+      # Checks out other branches and commits as well
+        with:
+          fetch-depth: 0
+      
+      # Change branch to the one where I keep the state
+      - name: Change branch
+        run: |
+          git config --global user.name 'luisfros'
+          git config --global user.email 'luisfros@users.noreply.github.com'
+          git checkout did-run
+      
+      # Check if it has already alerted today, based on whether a file is present
+      - name: "Check file existence"
+        run: |
+          # make file runnable, might not be necessary
+          chmod +x "${GITHUB_WORKSPACE}/bin/check-file-exists.sh"
+          
+          # run script
+          "${GITHUB_WORKSPACE}/bin/check-file-exists.sh"
+
+      # Cache the dependencies from any node_modules directory
+      - name: cache dependencies
+        uses: actions/cache@v2
+        with:
+          path: '**/node_modules'
+          key: node_modules-${{ hashFiles('**/package-lock.json')}}
+          
+      # Install dependencies
+      - name: install dependencies
+        run: npm install
+        
+      # Run the rain checker puppeteer test
+      - name: test 2
+        run: npm test
+
+      # Add the state file for today since we're about to send a rain notification 
+      - name: Add file for today to git
+        run: |
+          touch ./alerts/$(/bin/date +"%Y-%m-%d")
+          git config --global user.name 'luisfros'
+          git config --global user.email 'luisfros@users.noreply.github.com'
+          git add alerts/
+          git commit -m "Add state file for today"
+          git push
+          
+
+      - name: Create issue
+        uses: imjohnbo/issue-bot@3daae12aa54d38685d7ff8459fc8a2aee8cea98b
+        with:
+          assignees: "LuisFros"
+          labels: "weekly sync, docs-team"
+          title: "Rain"
+          body: |
+            ### It will rain soon
+          pinned: false
+          close-previous: true
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
