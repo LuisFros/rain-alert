@@ -30,11 +30,11 @@ describe('Check for rain Other', () => {
         bbox
       )}`
     )
+
     // Get the canvas and find a single pixel around Copenhagen
     const pixel = await page.evaluate(() => {
+      const img = <HTMLImageElement>document.querySelector('img')
       const canvas = <HTMLCanvasElement>document.createElement('canvas')
-      const img = <HTMLImageElement>document.getElementsByClassName('shrinkToFit')[0]
-      console.log(img)
       canvas.width = img.width
       canvas.height = img.height
       const centerX = canvas.width / 2
@@ -43,6 +43,7 @@ describe('Check for rain Other', () => {
       const canvasContext = canvas.getContext('2d')
       console.log(canvas, canvasContext)
       if (canvasContext) {
+        canvasContext.drawImage(img, 0, 0)
         // Get one pixel in the center of the image
         return canvasContext.getImageData(centerX, centerY, 1, 1).data
       }
