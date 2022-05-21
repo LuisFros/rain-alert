@@ -9,7 +9,7 @@ const browserConfig = {
 // const y = -3770863.25
 const x = -4940.77
 const y = -3623871.87
-describe('Check for rain', () => {
+describe('Check for rain Other', () => {
   let browser: any
   beforeEach(async () => {
     browser = await puppeteer.launch(browserConfig)
