@@ -5,10 +5,9 @@ const browserConfig = {
   devtools: false,
   args: ['--no-sandbox', '--disable-setuid-sandbox'] // For running on debian in docker
 }
-// const x = 157225.64
-// const y = -3770863.25
-const x = -4940.77
-const y = -3623871.87
+const x = 157225.64
+const y = -3770863.25
+
 describe('Check for rain Other', () => {
   let browser: any
   beforeEach(async () => {
@@ -21,6 +20,11 @@ describe('Check for rain Other', () => {
     const page = await browser.newPage()
     const bbox = encodeURIComponent(`${x - 15},${y - 15},${x + 15},${y + 15}`)
     const date = new Date()
+    date.setSeconds(0)
+    const min = date.getMinutes()
+    if (min % 5 !== 0) {
+      date.setMinutes(min - (min % 5))
+    }
     const dateEncoded = encodeURIComponent(date.toISOString())
 
     date.setTime(date.getTime() + 1 * 60 * 60 * 1000)
