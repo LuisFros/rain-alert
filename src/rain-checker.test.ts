@@ -20,6 +20,11 @@ describe('Check for rain Other', () => {
     const page = await browser.newPage()
     const bbox = encodeURIComponent(`${x - 15},${y - 15},${x + 15},${y + 15}`)
     const date = new Date()
+    date.setSeconds(0)
+    const min = date.getMinutes()
+    if (min % 5 !== 0) {
+      date.setMinutes(min - (min % 5))
+    }
     const dateEncoded = encodeURIComponent(date.toISOString())
 
     date.setTime(date.getTime() + 1 * 60 * 60 * 1000)
