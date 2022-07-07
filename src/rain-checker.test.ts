@@ -5,8 +5,9 @@ const browserConfig = {
   devtools: false,
   args: ['--no-sandbox', '--disable-setuid-sandbox'] // For running on debian in docker
 }
-const x = 157225.64
-const y = -3770863.25
+const x = 167422.01
+const y = -3771963.62
+
 
 describe('Check for rain Other', () => {
   let browser: any
